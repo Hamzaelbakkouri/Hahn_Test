@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using TicketManagement.API.DTOs;
@@ -18,7 +19,7 @@ namespace TicketManagement.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTickets([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, 
+        public async Task<IActionResult> GetTickets([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10,
             [FromQuery] string sortBy = "Id", [FromQuery] string sortOrder = "asc", [FromQuery] string filterBy = "")
         {
             var result = await _ticketService.GetTicketsAsync(pageNumber, pageSize, sortBy, sortOrder, filterBy);
@@ -58,7 +59,7 @@ namespace TicketManagement.API.Controllers
             {
                 return NotFound();
             }
-            
+
             ticket.Description = ticketDto.Description;
             ticket.Status = ticketDto.Status;
             ticket.Date = ticketDto.Date;
@@ -70,8 +71,15 @@ namespace TicketManagement.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTicket(int id)
         {
+            var ticket = await _ticketService.GetTicketByIdAsync(id);
+            if (ticket == null)
+            {
+                return NotFound(new { message = $"Ticket with ID {id} not found." });
+            }
+
             await _ticketService.DeleteTicketAsync(id);
-            return NoContent();
+
+            return Accepted();
         }
     }
 }

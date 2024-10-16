@@ -23,12 +23,12 @@ namespace TicketManagement.API.Services
 
             if (!string.IsNullOrEmpty(filterBy))
             {
-                query = query.Where(t => 
-                    t.Description.Contains(filterBy) || 
+                query = query.Where(t =>
+                    t.Description.Contains(filterBy) ||
                     t.Status.Contains(filterBy) ||
                     t.Date.ToString().Contains(filterBy));
             }
-            
+
             if (!string.IsNullOrEmpty(sortBy))
             {
                 switch (sortBy.ToLower())
@@ -104,7 +104,7 @@ namespace TicketManagement.API.Services
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket == null)
             {
-                return false;
+                throw new KeyNotFoundException("Ticket not found");
             }
 
             _context.Tickets.Remove(ticket);
